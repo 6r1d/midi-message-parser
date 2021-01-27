@@ -95,6 +95,11 @@ static midi_message_state_t validate_midi_message(midi_message_t *message)
         return VALID;
     }
 
+    if (message->command_type == MIDI_CMD_CONTROL  && message->bytes_length == 3)
+    {
+        return VALID;
+    }
+
     return INVALID;
 }
 
