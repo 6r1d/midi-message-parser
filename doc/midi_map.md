@@ -1,7 +1,7 @@
 # Possible MIDI commands
 
 Command list table derived from [this one](https://www.midi.org/specifications-old/item/table-2-expanded-messages-list-status-bytes).
-It might be slightly outdated, but seems similars to what VMPK and DAWs send so far.
+It might be slightly outdated, but seems similars to what [VMPK](https://vmpk.sourceforge.io/) and Linux [DAWs](https://en.wikipedia.org/wiki/Digital_audio_workstation) send so far.
 
 | Constant                       | C. value | Name                         | Hex range       | Dec range     |
 | ------------------------------ | -------- | ---------------------------- | --------------- | ------------- |
