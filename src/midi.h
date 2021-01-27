@@ -75,16 +75,6 @@ static midi_message_state_t validate_midi_message(midi_message_t *message)
         return INVALID;
     }
 
-    if (message->command_type == MIDI_CMD_SND_CTL_NINE  && message->bytes_length == 2)
-    {
-        return VALID;
-    }
-
-    if (message->command_type == MIDI_CMD_EFF_FIVE_DEPTH  && message->bytes_length == 2)
-    {
-        return VALID;
-    }
-
     if (message->bytes_length < 3)
     {
         return PENDING;

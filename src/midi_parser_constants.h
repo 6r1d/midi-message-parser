@@ -8,8 +8,6 @@
 /**
 * @file Constants for the MIDI command bytes.
 */
-#define MIDI_CMD_SND_CTL_NINE           0x4E // 78
-#define MIDI_CMD_EFF_FIVE_DEPTH         0x5F // 95
 #define MIDI_CMD_NOTE_OFF               0x80
 #define MIDI_CMD_NOTE_ON                0x90
 #define MIDI_CMD_NOTE_PRESSURE          0xa0
@@ -38,9 +36,6 @@
 * @brief Array containing the constants representing the valid MIDI command types.
 */
 const uint8_t MIDI_COMMAND_TYPES[] = {
-    MIDI_CMD_SND_CTL_NINE,
-    MIDI_CMD_EFF_FIVE_DEPTH,
-    //
     MIDI_CMD_NOTE_OFF,
     MIDI_CMD_NOTE_ON,
     MIDI_CMD_NOTE_PRESSURE,
