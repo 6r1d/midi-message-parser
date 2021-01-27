@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "midi.h"
 
+// Displays bytes of a MIDI message
 void display_midi_message(midi_message_t * message, uint16_t length) {
     for (uint8_t i = 0; i < length; i++) {
         printf("b %d: [0x%02x][%d]\n", i, message->bytes[i], message->bytes[i]);
@@ -9,12 +10,12 @@ void display_midi_message(midi_message_t * message, uint16_t length) {
 }
 
 void test_midi_message(uint8_t * bytes, uint16_t length) {
-    //
+    // Initialize a MIDI parser instance
     midi_message_parser_t * parser = new_midi_message_parser();
     midi_message_t * message;
-    //
+    // Create an instance for a message
     uint16_t bytes_parsed = 0;
-    //
+    // Parse a message
     message = parse_midi_message(parser, bytes, length, &bytes_parsed);
     printf("Length: %d\n", length);
     if (message) {
@@ -22,6 +23,7 @@ void test_midi_message(uint8_t * bytes, uint16_t length) {
         printf("CN: %d\n", message->channel);
         display_midi_message(message, length);
     }
+    // Free a MIDI parser instance
     free(parser);
 }
 
