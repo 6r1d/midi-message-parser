@@ -32,6 +32,8 @@ int main(int argc, char *argv[]) {
     uint8_t knob_turn_a[] = {MIDI_CMD_CONTROL, 1,  127};
     // 2 - breath controller
     uint8_t knob_turn_b[] = {MIDI_CMD_CONTROL + 0xF, 2,  127};
+    // pitch bend
+    uint8_t pitch_bend[] = {0xE0, 0x00, 0x40};
 
     printf("Note on\n");
     test_midi_message(note_on_bytes, 3);
@@ -47,6 +49,10 @@ int main(int argc, char *argv[]) {
 
     printf("Knob turn, breath controller, channel 15\n");
     test_midi_message(knob_turn_b, 3);
+    printf("\n");
+
+    printf("Pitch bend\n");
+    test_midi_message(pitch_bend, 3);
     printf("\n");
 
     return 0;
