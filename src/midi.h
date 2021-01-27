@@ -85,18 +85,12 @@ static midi_message_state_t validate_midi_message(midi_message_t *message)
         return message->bytes[message->bytes_length - 1] == MIDI_CMD_COMMON_SYSEX_END ? VALID : PENDING;
     }
 
-    if (message->command_type == MIDI_CMD_NOTE_OFF && message->bytes_length == 3)
-    {
-        return VALID;
-    }
-
-    if (message->command_type == MIDI_CMD_NOTE_ON  && message->bytes_length == 3)
-    {
-        return VALID;
-    }
-
-    if (message->command_type == MIDI_CMD_CONTROL  && message->bytes_length == 3)
-    {
+    // Allow some of the 3-byte messages
+    if (
+        message->command_type >= 0x80 &&
+        message->command_type <= 0xEF &&
+        message->bytes_length == 3
+    ) {
         return VALID;
     }
 
