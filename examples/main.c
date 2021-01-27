@@ -18,7 +18,8 @@ void test_midi_message(uint8_t * bytes, uint16_t length) {
     message = parse_midi_message(parser, bytes, length, &bytes_parsed);
     printf("Length: %d\n", length);
     if (message) {
-        printf("%d\n", message->command_type);
+        printf("CT: %d\n", message->command_type);
+        printf("CN: %d\n", message->channel);
         display_midi_message(message, length);
     }
     free(parser);
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
     // 1 - modulation
     uint8_t knob_turn_a[] = {MIDI_CMD_CONTROL, 1,  127};
     // 2 - breath controller
-    uint8_t knob_turn_b[] = {MIDI_CMD_CONTROL, 2,  127};
+    uint8_t knob_turn_b[] = {MIDI_CMD_CONTROL + 0xF, 2,  127};
 
     printf("Note on\n");
     test_midi_message(note_on_bytes, 3);
@@ -40,12 +41,12 @@ int main(int argc, char *argv[]) {
     test_midi_message(note_off_bytes, 3);
     printf("\n");
 
-    printf("Knob turn\n");
-    test_midi_message(knob_turn_a, 2);
+    printf("Knob turn, modulation, channel 0\n");
+    test_midi_message(knob_turn_a, 3);
     printf("\n");
 
-    printf("Knob turn (2)\n");
-    test_midi_message(knob_turn_b, 2);
+    printf("Knob turn, breath controller, channel 15\n");
+    test_midi_message(knob_turn_b, 3);
     printf("\n");
 
     return 0;
