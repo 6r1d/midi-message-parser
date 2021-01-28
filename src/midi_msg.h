@@ -92,3 +92,96 @@ void add_bytes_to_midi_message(midi_message_t **message_ptr, uint8_t *bytes, uin
     message->bytes_length += bytes_length;
 }
 #endif
+
+#ifndef MIDI_GETTYPE
+#define MIDI_GETTYPE
+
+/**
+* @brief Returns a `char` array describing a MIDI message type.
+*/
+const char * get_midi_msg_type(uint8_t command_type)
+{
+    // Allocate memory for a result string
+    char * result = calloc(64, sizeof(char));
+    // bit masking using 0b00001111 / 0x0f;
+    // incrementing a value, since channels of
+    // Expanded MIDI 1.0 Messages List start with 1
+    uint8_t midi_channel = midi_channel = command_type & 0x0F;
+    // Fill MIDI command name
+    switch (command_type) {
+        case MIDI_CMD_NOTE_OFF ... MIDI_CMD_NOTE_OFF + 0xF:
+            sprintf(result, "NOTE OFF, %d", midi_channel);
+            break;
+        case MIDI_CMD_NOTE_ON ... MIDI_CMD_NOTE_ON + 0xF:
+            sprintf(result, "NOTE ON, %d", midi_channel);
+            break;
+        case 0xA0 ... 0xAF:
+            sprintf(result, "POLYPHONIC AFTERTOUCH, %d", midi_channel);
+            break;
+        case MIDI_CMD_CONTROL ... MIDI_CMD_CONTROL + 0xF:
+            sprintf(result, "CONTROL CHANGE / MODE CHANGE, %d", midi_channel);
+            break;
+        case MIDI_CMD_PGM_CHANGE ... MIDI_CMD_PGM_CHANGE + 0xF:
+            sprintf(result, "PROGRAM CHANGE, %d", midi_channel);
+            break;
+        case MIDI_CMD_CHANNEL_PRESSURE ... MIDI_CMD_CHANNEL_PRESSURE + 0xF:
+            sprintf(result, "AFTERTOUCH, %d", midi_channel);
+            break;
+        case MIDI_CMD_BENDER ... MIDI_CMD_BENDER + 0xF:
+            sprintf(result, "PITCH BEND CHANGE, %d", midi_channel);
+            break;        
+        case 0xF0:
+            sprintf(result, "SYSEX START");
+            break;
+        case 0xF1:
+            sprintf(result, "MIDI TIME CODE QTR. FRAME");
+            break;
+        case 0xF2:
+            sprintf(result, "SONG POSITION POINTER");
+            break;
+        case MIDI_CMD_COMMON_SONG_SELECT:
+            sprintf(result, "SONG SELECT / SONG #");
+            break;
+        case 0xF4:
+            sprintf(result, "UNDEFINED / RESERVED");
+            break;
+        case 0xF5:
+            sprintf(result, "UNDEFINED / RESERVED");
+            break;
+        case MIDI_CMD_COMMON_TUNE_REQUEST:
+            sprintf(result, "TUNE REQUEST");
+            break;
+        case MIDI_CMD_COMMON_SYSEX_END:
+            sprintf(result, "SYSEX END");
+            break;
+        case MIDI_CMD_COMMON_CLOCK:
+            sprintf(result, "TIMING CLOCK");
+            break;
+        case 0xF9:
+            sprintf(result, "UNDEFINED / RESERVED");
+            break;
+        case 0xFA:
+            sprintf(result, "START");
+            break;
+        case MIDI_CMD_COMMON_CONTINUE:
+            sprintf(result, "CONTINUE");
+            break;
+        case MIDI_CMD_COMMON_STOP:
+            sprintf(result, "STOP");
+            break;
+        case 0xFD:
+            sprintf(result, "UNDEFINED / RESERVED");
+            break;
+        case MIDI_CMD_COMMON_SENSING:
+            sprintf(result, "ACTIVE SENSING");
+            break;
+        case MIDI_CMD_COMMON_RESET:
+            sprintf(result, "SYSTEM RESET");
+            break;
+        default:
+            sprintf(result, "UNKNOWN VALUE");
+    }
+    return result;
+}
+
+#endif
