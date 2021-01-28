@@ -1,13 +1,34 @@
+#include <stdint.h>
 #include "midi_parser_constants.h"
 #include "midi_mem.h"
 
 #ifndef MIDI_PARSER_MSG_
 #define MIDI_PARSER_MSG_
+struct midi_note_message
+{
+    uint8_t note;
+    double frequency;
+    uint8_t velocity;
+    uint8_t channel;
+} midi_note_message;
+struct midi_cc_message
+{
+    uint8_t control_id;
+    uint8_t value;
+    uint8_t channel;
+} midi_cc_message;
+
 /**@brief A MIDI message. */
 typedef struct {
     uint8_t  command_type;  /**< One of the command type constants defined above. */
     uint8_t  channel;       /**< Channel number for commands that apply to a specific channel (e.g. note on, note off) */
     uint32_t bytes_length; /**< The total number of bytes that constitute the message. */
+
+    union data {
+        struct midi_note_message note_message;
+        struct midi_cc_message cc_message;
+    } msg_data;
+
     uint8_t  bytes[];      /**< All the bytes that constitute the message (one status byte plus zero or more data bytes). */
 } midi_message_t;
 
@@ -129,7 +150,7 @@ const char * get_midi_msg_type(uint8_t command_type)
             break;
         case MIDI_CMD_BENDER ... MIDI_CMD_BENDER + 0xF:
             sprintf(result, "PITCH BEND CHANGE, %d", midi_channel);
-            break;        
+            break;
         case 0xF0:
             sprintf(result, "SYSEX START");
             break;
