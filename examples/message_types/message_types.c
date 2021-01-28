@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
     while (value != 0) {
         name = get_midi_msg_type(value);
         printf("%s\n", name);
+        free((char*)name);
         value++;
     }
     // Exit normally
