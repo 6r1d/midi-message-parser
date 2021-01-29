@@ -214,11 +214,13 @@ const char * get_midi_msg_type(uint8_t command_type)
 void bytes_to_data(midi_message_t *message) {
     if (message->command_type >= MIDI_CMD_NOTE_OFF && message->command_type <= MIDI_CMD_NOTE_OFF + 0xF) {
         message->msg_data.note_message.note = message->bytes[1];
-        message->msg_data.note_message.velocity = message->bytes[2];
+        message->msg_data.note_message.velocity = 0;
+        message->msg_data.note_message.frequency = NOTE_FREQS[message->bytes[1]];
     }
     if (message->command_type >= MIDI_CMD_NOTE_ON && message->command_type <= MIDI_CMD_NOTE_ON + 0xF) {
         message->msg_data.note_message.note = message->bytes[1];
         message->msg_data.note_message.velocity = message->bytes[2];
+        message->msg_data.note_message.frequency = NOTE_FREQS[message->bytes[1]];
     }
     if (message->command_type >= MIDI_CMD_CONTROL && message->command_type <= MIDI_CMD_CONTROL + 0xF) {
         // Messages from 0 to 63 can be decoded
