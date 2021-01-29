@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <stdbool.h>
 #include "midi_parser_constants.h"
 #include "midi_mem.h"
 
@@ -9,32 +9,38 @@ struct midi_note_message
     uint8_t note;
     double frequency;
     uint8_t velocity;
-    uint8_t channel;
 } midi_note_message;
 struct midi_cc_message
 {
-    uint8_t control_id;
+    bool decoded;
+    bool msb;
+    uint8_t cc_id;
     uint8_t value;
-    uint8_t channel;
 } midi_cc_message;
 
-/**@brief A MIDI message. */
+/*
+ * @brief A MIDI message.
+ */
 typedef struct {
-    uint8_t  command_type;  /**< One of the command type constants defined above. */
-    uint8_t  channel;       /**< Channel number for commands that apply to a specific channel (e.g. note on, note off) */
-    uint32_t bytes_length; /**< The total number of bytes that constitute the message. */
+    uint8_t  command_type;
+    /**< One of the command type constants defined above. */
+    uint8_t  channel;
+    /**< Channel number for commands that apply to a specific channel (e.g. note on, note off) */
+    uint32_t bytes_length;
+    /**< The total number of bytes that constitute the message. */
 
     union data {
         struct midi_note_message note_message;
         struct midi_cc_message cc_message;
     } msg_data;
 
-    uint8_t  bytes[];      /**< All the bytes that constitute the message (one status byte plus zero or more data bytes). */
+    uint8_t  bytes[];
+    /**< All the bytes that constitute the message (one status byte plus zero or more data bytes). */
 } midi_message_t;
 
-/**
-* @brief MIDI message constructor
-*/
+/*
+ * @brief MIDI message constructor
+ */
 midi_message_t * new_midi_message()
 {
     midi_message_t *message = (midi_message_t *) midi_malloc_with_hook(MIDI_MEMORY_CATEGORY, sizeof(midi_message_t));
@@ -44,9 +50,9 @@ midi_message_t * new_midi_message()
     return message;
 }
 
-/**
-* @brief Deallocates the memory for a midi message.
-*/
+/*
+ * @brief Deallocates the memory for a midi message.
+ */
 void free_midi_message(midi_message_t * message)
 {
     if (message == NULL)
@@ -58,12 +64,12 @@ void free_midi_message(midi_message_t * message)
     midi_free_with_hook(MIDI_MEMORY_CATEGORY, message, size);
 }
 
-/**
-* @brief Adds a byte of data to a MIDI message's `bytes` array.
-*
-* @param[in,out] message_ptr - Pointer to the message into which the byte should be pushed
-* @param[in]     byte        - The byte to push into the message's `bytes` array
-*/
+/*
+ * @brief Adds a byte of data to a MIDI message's `bytes` array.
+ *
+ * @param[in,out] message_ptr - Pointer to the message into which the byte should be pushed
+ * @param[in]     byte        - The byte to push into the message's `bytes` array
+ */
 void add_byte_to_midi_message(midi_message_t **message_ptr, uint8_t byte)
 {
 
@@ -85,13 +91,13 @@ void add_byte_to_midi_message(midi_message_t **message_ptr, uint8_t byte)
     (*message_ptr)->bytes[(*message_ptr)->bytes_length - 1] = byte;
 }
 
-/**
-* @brief Appends multiple bytes of data to a MIDI message's `bytes` array.
-*
-* @param[in,out] message_ptr  - Pointer to the message into which the byte should be pushed
-* @param[in]     bytes        - The bytes to push into the message's `bytes` array
-* @param[in]     bytes_length - The length of the bytes array.
-*/
+/*
+ * @brief Appends multiple bytes of data to a MIDI message's `bytes` array.
+ *
+ * @param[in,out] message_ptr  - Pointer to the message into which the byte should be pushed
+ * @param[in]     bytes        - The bytes to push into the message's `bytes` array
+ * @param[in]     bytes_length - The length of the bytes array.
+ */
 void add_bytes_to_midi_message(midi_message_t **message_ptr, uint8_t *bytes, uint16_t bytes_length)
 {
     if (message_ptr == NULL || *message_ptr == NULL)
@@ -117,9 +123,9 @@ void add_bytes_to_midi_message(midi_message_t **message_ptr, uint8_t *bytes, uin
 #ifndef MIDI_GETTYPE
 #define MIDI_GETTYPE
 
-/**
-* @brief Returns a `char` array describing a MIDI message type.
-*/
+/*
+ * @brief Returns a `char` array describing a MIDI message type.
+ */
 const char * get_midi_msg_type(uint8_t command_type)
 {
     // Allocate memory for a result string
@@ -205,4 +211,25 @@ const char * get_midi_msg_type(uint8_t command_type)
     return result;
 }
 
+void bytes_to_data(midi_message_t *message) {
+    if (message->command_type >= MIDI_CMD_NOTE_OFF && message->command_type <= MIDI_CMD_NOTE_OFF + 0xF) {
+        message->msg_data.note_message.note = message->bytes[1];
+        message->msg_data.note_message.velocity = message->bytes[2];
+    }
+    if (message->command_type >= MIDI_CMD_NOTE_ON && message->command_type <= MIDI_CMD_NOTE_ON + 0xF) {
+        message->msg_data.note_message.note = message->bytes[1];
+        message->msg_data.note_message.velocity = message->bytes[2];
+    }
+    if (message->command_type >= MIDI_CMD_CONTROL && message->command_type <= MIDI_CMD_CONTROL + 0xF) {
+        // Messages from 0 to 63 can be decoded
+        if (message->command_type < 64) {
+            message->msg_data.cc_message.decoded = true;
+            message->msg_data.cc_message.msb = message->command_type < 32;
+            message->msg_data.cc_message.cc_id = (message->command_type < 32) ? message->command_type : message->command_type - 32;
+            message->msg_data.cc_message.value = message->bytes[2];
+        } else {
+            message->msg_data.cc_message.decoded = false;
+        }
+    }
+}
 #endif

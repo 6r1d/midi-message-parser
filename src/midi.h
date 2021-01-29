@@ -201,7 +201,9 @@ midi_message_t * parse_midi_message(midi_message_parser_t *parser, uint8_t *byte
         switch (state)
         {
             case VALID:
-            {   // Brackets needed to create a scope for the local var.
+            {
+                bytes_to_data(parser->_pending_message);
+                // Brackets needed to create a scope for the local var.
                 midi_message_t *complete_message = parser->_pending_message;
                 parser->_pending_message = NULL;
                 *number_of_bytes_parsed = byte_index + 1;
