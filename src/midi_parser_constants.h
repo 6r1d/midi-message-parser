@@ -1,3 +1,7 @@
+#ifndef NULL
+    #define NULL 0
+#endif
+
 #ifndef MIDI_PARSER_CONSTANTS__
 #define MIDI_PARSER_CONSTANTS__
 
@@ -27,10 +31,6 @@
 #define MIDI_CMD_COMMON_STOP            0xfc
 #define MIDI_CMD_COMMON_SENSING         0xfe
 #define MIDI_CMD_COMMON_RESET           0xff
-
-#ifndef NULL
-    #define NULL 0
-#endif
 
 /**
 * @brief Array containing the constants representing the valid MIDI command types.
