@@ -4,19 +4,6 @@
 
 #ifndef MIDI_PARSER_MSG_
 #define MIDI_PARSER_MSG_
-struct midi_note_message
-{
-    uint8_t note;
-    double frequency;
-    uint8_t velocity;
-} midi_note_message;
-struct midi_cc_message
-{
-    bool decoded;
-    bool msb;
-    uint8_t cc_id;
-    uint8_t value;
-} midi_cc_message;
 
 /*
  * @brief A MIDI message.
@@ -30,9 +17,19 @@ typedef struct {
     /**< The total number of bytes that constitute the message. */
 
     union data {
-        struct midi_note_message note_message;
-        struct midi_cc_message cc_message;
-    } msg_data;
+        struct midi_note_message {
+            uint8_t note;
+            double frequency;
+            uint8_t velocity;
+        } note_message;
+        struct midi_cc_message {
+            bool decoded;
+            bool msb;
+            bool is_single_byte;
+            uint8_t cc_id;
+            uint8_t value;
+        } cc_message;
+    } cnt;
 
     uint8_t  bytes[];
     /**< All the bytes that constitute the message (one status byte plus zero or more data bytes). */
@@ -212,25 +209,35 @@ const char * get_midi_msg_type(uint8_t command_type)
 }
 
 void bytes_to_data(midi_message_t *message) {
-    if (message->command_type >= MIDI_CMD_NOTE_OFF && message->command_type <= MIDI_CMD_NOTE_OFF + 0xF) {
-        message->msg_data.note_message.note = message->bytes[1];
-        message->msg_data.note_message.velocity = 0;
-        message->msg_data.note_message.frequency = NOTE_FREQS[message->bytes[1]];
+    uint8_t cmd_type = message->command_type;
+    if (cmd_type >= MIDI_CMD_NOTE_OFF && cmd_type <= MIDI_CMD_NOTE_OFF + 0xF) {
+        message->cnt.note_message.note = message->bytes[1];
+        message->cnt.note_message.velocity = 0;
+        message->cnt.note_message.frequency = NOTE_FREQS[message->bytes[1]];
     }
-    if (message->command_type >= MIDI_CMD_NOTE_ON && message->command_type <= MIDI_CMD_NOTE_ON + 0xF) {
-        message->msg_data.note_message.note = message->bytes[1];
-        message->msg_data.note_message.velocity = message->bytes[2];
-        message->msg_data.note_message.frequency = NOTE_FREQS[message->bytes[1]];
+    if (cmd_type >= MIDI_CMD_NOTE_ON && cmd_type <= MIDI_CMD_NOTE_ON + 0xF) {
+        message->cnt.note_message.note = message->bytes[1];
+        message->cnt.note_message.velocity = message->bytes[2];
+        message->cnt.note_message.frequency = NOTE_FREQS[message->bytes[1]];
     }
-    if (message->command_type >= MIDI_CMD_CONTROL && message->command_type <= MIDI_CMD_CONTROL + 0xF) {
+    if (cmd_type >= MIDI_CMD_CONTROL && cmd_type <= MIDI_CMD_CONTROL + 0xF) {
         // Messages from 0 to 63 can be decoded
-        if (message->command_type < 64) {
-            message->msg_data.cc_message.decoded = true;
-            message->msg_data.cc_message.msb = message->command_type < 32;
-            message->msg_data.cc_message.cc_id = (message->command_type < 32) ? message->command_type : message->command_type - 32;
-            message->msg_data.cc_message.value = message->bytes[2];
+        if (cmd_type < 64) {
+            message->cnt.cc_message.decoded = true;
+            message->cnt.cc_message.msb = cmd_type < 32;
+            message->cnt.cc_message.cc_id = (cmd_type < 32) ?
+                cmd_type : cmd_type - 32;
+            message->cnt.cc_message.value = message->bytes[2];
+        } elseif (cmd_type < 95) {
+            message->cnt.cc_message.decoded = true;
+            // 64 through 95 are additional single-byte controllers
+            // according to the MIDI 1.0 Detailed Specification
+            message->cnt.cc_message.is_single_byte = true;
+            message->cnt.cc_message.msb = true;
+            message->cnt.cc_message.cc_id = cmd_type;
+            message->cnt.cc_message.value = message->bytes[2];
         } else {
-            message->msg_data.cc_message.decoded = false;
+            message->cnt.cc_message.decoded = false;
         }
     }
 }
