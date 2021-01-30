@@ -25,6 +25,8 @@ typedef struct {
         struct midi_cc_message {
             bool decoded;
             bool msb;
+            // 64 through 95 are additional single-byte controllers
+            // according to the MIDI 1.0 Detailed Specification
             bool is_single_byte;
             uint8_t cc_id;
             uint8_t value;
@@ -221,17 +223,17 @@ void bytes_to_data(midi_message_t *message) {
         message->cnt.note_message.frequency = NOTE_FREQS[message->bytes[1]];
     }
     if (cmd_type >= MIDI_CMD_CONTROL && cmd_type <= MIDI_CMD_CONTROL + 0xF) {
+        uint8_t cc_type = message->bytes[1];
         // Messages from 0 to 63 can be decoded
-        if (cmd_type < 64) {
+        if (cc_type < 64) {
             message->cnt.cc_message.decoded = true;
-            message->cnt.cc_message.msb = cmd_type < 32;
-            message->cnt.cc_message.cc_id = (cmd_type < 32) ?
-                cmd_type : cmd_type - 32;
+            message->cnt.cc_message.is_single_byte = false;
+            message->cnt.cc_message.msb = cc_type < 32;
+            message->cnt.cc_message.cc_id = (cc_type < 32) ?
+                cc_type : cc_type - 32;
             message->cnt.cc_message.value = message->bytes[2];
-        } elseif (cmd_type < 95) {
+        } else if (cc_type < 95) {
             message->cnt.cc_message.decoded = true;
-            // 64 through 95 are additional single-byte controllers
-            // according to the MIDI 1.0 Detailed Specification
             message->cnt.cc_message.is_single_byte = true;
             message->cnt.cc_message.msb = true;
             message->cnt.cc_message.cc_id = cmd_type;
