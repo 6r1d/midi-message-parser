@@ -30,6 +30,8 @@ typedef struct {
             bool is_single_byte;
             uint8_t cc_id;
             uint8_t value;
+            // 0 - 63: ccr_base, 64 - 95: ccr_singlebyte, 96 - 101: ccr_inc_dec_par, 102 - 119: cc_undefined
+            enum command_change_range {ccr_base, ccr_singlebyte, ccr_inc_dec_par, ccr_undefined} cc_range;
         } cc_message;
     } cnt;
 
@@ -232,14 +234,20 @@ void bytes_to_data(midi_message_t *message) {
             message->cnt.cc_message.cc_id = (cc_type < 32) ?
                 cc_type : cc_type - 32;
             message->cnt.cc_message.value = message->bytes[2];
+            message->cnt.cc_message.cc_range = ccr_base;
         } else if (cc_type < 95) {
             message->cnt.cc_message.decoded = true;
             message->cnt.cc_message.is_single_byte = true;
             message->cnt.cc_message.msb = true;
             message->cnt.cc_message.cc_id = cmd_type;
             message->cnt.cc_message.value = message->bytes[2];
+            message->cnt.cc_message.cc_range = ccr_singlebyte;
+        } else if (cc_type < 101) {
+            message->cnt.cc_message.decoded = false;
+            message->cnt.cc_message.cc_range = ccr_inc_dec_par;
         } else {
             message->cnt.cc_message.decoded = false;
+            message->cnt.cc_message.cc_range = ccr_undefined;
         }
     }
 }
