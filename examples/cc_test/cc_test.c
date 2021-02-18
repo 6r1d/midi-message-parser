@@ -41,17 +41,17 @@ void test_midi_message(uint8_t * bytes) {
     free(parser);
 }
 
-void test_message_range(unsigned int cc_start, unsigned int cc_stop) {
+void test_message_range(unsigned int cc_start, unsigned int cc_stop, uint8_t ins_min, uint8_t ins_max) {
     // 1st byte of a MIDI message, determining a command
     // (always CC for the example) and a channel
     unsigned int cmd_byte;
     // Message container, contains three zero bytes
     uint8_t message[3]  = {0};
     // Iterate through CC values and parse them
-    for (cmd_byte = cc_start; cmd_byte < cc_stop; cmd_byte++) {
+    for (cmd_byte = cc_start; cmd_byte <= cc_stop; cmd_byte++) {
         message[0] = cmd_byte;
         // Iterate through CC instruction bytes
-        for (uint8_t ins_byte=0; ins_byte<64; ins_byte++) {
+        for (uint8_t ins_byte = ins_min; ins_byte <= ins_max; ins_byte++) {
             message[1] = ins_byte;
             // Iterate through the values
             for (uint8_t val_byte = 0; val_byte < 3; val_byte++) {
@@ -63,7 +63,7 @@ void test_message_range(unsigned int cc_start, unsigned int cc_stop) {
 }
 
 int main(int argc, char *argv[]) {
-    test_message_range(CC_MIN, CC_MIN + 1);
+    test_message_range(CC_MIN, CC_MIN + 1, 0, 63);
 
     return 0;
 }
