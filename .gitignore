@@ -3,3 +3,7 @@ _build
 .breakpoints
 npm-debug.log
 doc/_build
+examples/cc_test/cc_test
+examples/main/main
+examples/message_types/message_types
+

@@ -6,6 +6,7 @@ To-Do
 
 * Document the sources
 * Document examples
+* Check if unused commands don't influence the parsing (244, 245, 249, 253)
 * Add an `architecture description <https://matklad.github.io/2021/02/06/ARCHITECTURE.md>`_
 * Check how logging header functions, check if library can be used on different platforms
 * Check if it's possible to feed "bytes_to_data" malformed values (probably not, because note byte has a fixed range of values)
