@@ -4,7 +4,6 @@ Development plan
 To-Do
 -----
 
-* Document the sources
 * Document examples
 * Check if unused commands don't influence the parsing (244, 245, 249, 253)
 * Add an `architecture description <https://matklad.github.io/2021/02/06/ARCHITECTURE.md>`_
@@ -17,3 +16,4 @@ Done
 ----
 
 * Reconsider header file naming, "midi" word repeats several times
+* Document the sources
