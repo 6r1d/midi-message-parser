@@ -1,6 +1,7 @@
 #include "parser_constants.h"
 
-// Allow logging functionality to be excluded, because devices with memory limitations may not
+// Allow logging functionality to be excluded,
+// because devices with memory limitations may not
 // have the capacity to include stdarg.h
 #ifndef LOGGING_DISABLED
     #include <stdarg.h>
@@ -10,10 +11,12 @@
 #ifndef LOGGING_DISABLED
 
 /**
-* @brief Function for logging.
-*
-* @param[in] format - Message to log.
-*/
+ * Function for logging.
+ *
+ * :param format: Message to log. (**Input only**)
+ *
+ * :since: v0.1
+ */
 typedef void (*logging_function_t) (const char *message);
 
 #endif // LOGGING_DISABLED
@@ -25,10 +28,12 @@ static logging_function_t m_logging_function = NULL;
 
 #ifndef LOGGING_DISABLED
 /**
-* @brief Allows the user to register a logging function to enable logging.
-*
-* @param[in] logging_function
-*/
+ * Allows the user to register a logging function to enable logging.
+ *
+ * :param logging_function: (**Input only**)
+ *
+ * :since: v0.1
+ */
 void midi_register_logging_function(logging_function_t logging_function)
 {
     m_logging_function = logging_function;
@@ -36,11 +41,13 @@ void midi_register_logging_function(logging_function_t logging_function)
 #endif // LOGGING_DISABLED
 
 /**
-* @brief A printf-like function that logs a given message.
-*
-* @param[in] message - Format string
-* @param[in] ...     - Variable number of arguments for format specifiers.
-*/
+ * A printf-like function that logs a given message.
+ *
+ * :param message: Format string (**Input only**)
+ * :param ...:     Variable number of arguments for format specifiers. (**Input only**)
+ *
+ * :since: v0.1
+ */
 void midi_log_info(const char *message, ...)
 {
     if (m_logging_function == NULL)
@@ -59,11 +66,13 @@ void midi_log_info(const char *message, ...)
 }
 
 /**
-* @brief Logs the given bytes.
-*
-* @param[in] bytes
-* @param[in] length - The number of bytes.
-*/
+ * Logs the given bytes.
+ *
+ * :param bytes: (**Input only**)
+ * :param length: The number of bytes. (**Input only**)
+ *
+ * :since: v0.1
+ */
 void midi_log_bytes(uint8_t *bytes, uint16_t length)
 {
     if (length == 0) {

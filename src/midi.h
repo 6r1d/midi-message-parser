@@ -1,6 +1,8 @@
 #ifndef MIDI_H__
 #define MIDI_H__
 
+#define VERSION 0.1
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -14,23 +16,44 @@
 #include "parser_constants.h"
 
 /**
-* @brief Enum for the possible states of a pending message being parsed.
-*/
+ * Enum for the possible states of a pending message being parsed.
+ */
 typedef enum midi_message_state {
-    VALID,   /**< Indicates a complete and valid message that is ready to be used. */
-    PENDING, /**< Indicates that the message is not fully received yet. */
-    INVALID  /**< Indicates that the message has been fully received but is invalid. */
+    /**
+     * Indicates a complete and valid message that is ready to be used.
+     */
+    VALID,
+    /**
+     * Indicates that the message is not fully received yet.
+     */
+    PENDING,
+    /**
+     * Indicates that the message has been fully received but is invalid.
+     */
+    INVALID
 } midi_message_state_t;
 
-/**@brief Keeps track of pending MIDI messages for which we're still waiting for the remaining bytes. */
+/**
+ * Keeps track of pending MIDI messages 
+ * for which we're still waiting for the remaining bytes.
+ */
 typedef struct {
-    midi_message_t *_pending_message; /**< Saves a partial message for which the end has not yet been received. */
+    /**
+     * Saves a partial message
+     * for which the end has not yet been received.
+     */
+    midi_message_t *_pending_message;
 } midi_message_parser_t;
 
 /**
-* @brief Helper function to indicate whether a given byte is a MIDI command byte
-*        (i.e. a byte with bit 7 set).
-*/
+ * Helper function to indicate whether a given byte is a MIDI command byte
+ * (i.e. a byte with bit 7 set).
+ *
+ * :param byte: uint8_t form of a byte
+ * :return: a boolean parameter, determining if a byte is a MIDI command byte
+ *
+ * :since: v0.1
+ */
 bool is_command_byte(uint8_t byte)
 {
     // TODO think how to improve
@@ -39,8 +62,10 @@ bool is_command_byte(uint8_t byte)
 }
 
 /**
-* @brief MIDI message parser constructor
-*/
+ * MIDI message parser constructor
+ *
+ * :since: v0.1
+ */
 midi_message_parser_t * new_midi_message_parser()
 {
     midi_message_parser_t *parser = (midi_message_parser_t *) midi_malloc_with_hook(MIDI_MEMORY_CATEGORY, sizeof(midi_message_parser_t));
@@ -49,8 +74,12 @@ midi_message_parser_t * new_midi_message_parser()
 }
 
 /**
-* @brief MIDI message parser destructor
-*/
+ * MIDI message parser destructor
+ *
+ * :param parser: a parser instance for the cleanup
+ *
+ * :since: v0.1
+ */
 void free_midi_message_parser(midi_message_parser_t *parser)
 {
     if (!parser)
@@ -66,8 +95,12 @@ void free_midi_message_parser(midi_message_parser_t *parser)
 }
 
 /**
-* Indicates whether the given MIDI message is valid, invalid, or pending.
-*/
+ * Indicates whether the given MIDI message is valid, invalid, or pending.
+ *
+ * :param message: MIDI message to validate
+ *
+ * :since: v0.1
+ */
 static midi_message_state_t validate_midi_message(midi_message_t *message)
 {
     if (message == NULL)
@@ -98,12 +131,15 @@ static midi_message_state_t validate_midi_message(midi_message_t *message)
 }
 
 /**
-* @brief Used by the MIDI message constructor to detect whether a given byte is a valid MIDI status byte
-*        and, if so, to allocate memory for a new MIDI message instance.
-*
-* @param[in] status_byte The first byte of the MIDI message, which should be a command byte.
-* @return                The new MIDI message if status_byte is a valid MIDI command byte, otherwise NULL.
-*/
+ * Used by the MIDI message constructor
+ * to detect whether a given byte is a valid MIDI status bytem, and,
+ * if so, to allocate memory for a new MIDI message instance.
+ *
+ * :param status_byte: The first byte of the MIDI message, which should be a command byte. (**Input only**.)
+ * :return:            The new MIDI message if status_byte is a valid MIDI command byte, otherwise NULL.
+ *
+ * :since: v0.1
+ */
 static midi_message_t * _parse_message_from_status_byte(uint8_t status_byte)
 {
     if (!is_command_byte(status_byte))
@@ -162,15 +198,18 @@ static midi_message_t * _parse_message_from_status_byte(uint8_t status_byte)
 }
 
 /**
-* @brief Given an array of bytes that may contain one or more MIDI messages
-*        it will construct the midi_message_t instance from the first MIDI message in the array it
-*        encounters. If it doesn't encounter any MIDI messages in the array, it returns NULL.
-*
-* @param[in]  parser                 - Message parser that keeps track of unfinished messages for which the final bites have yet to be received.
-* @param[in]  bytes                  - The message bytes to parse
-* @param[in]  length                 - Length of the message byte buffer
-* @param[out] number_of_bytes_parsed - The number of bytes parsed
-*/
+ * Given an array of bytes that may contain one or more MIDI messages
+ * it will construct the midi_message_t instance from the first MIDI message in the array it
+ * encounters. If it doesn't encounter any MIDI messages in the array, it returns NULL.
+ *
+ * :param parser:                 Message parser that keeps track of unfinished messages
+ *                                for which the final bites have yet to be received. (**Input only**.)
+ * :param bytes:                  The message bytes to parse (**Input only**.)
+ * :param length:                 Length of the message byte buffer (**Input only**.)
+ * :param number_of_bytes_parsed: The number of bytes parsed (**Output only**.)
+ *
+ * :since: v0.1
+ */
 midi_message_t * parse_midi_message(midi_message_parser_t *parser, uint8_t *bytes, uint16_t length, uint16_t *number_of_bytes_parsed)
 {
     for (uint16_t byte_index = 0; byte_index < length; byte_index++)
@@ -224,12 +263,18 @@ midi_message_t * parse_midi_message(midi_message_parser_t *parser, uint8_t *byte
 }
 
 /**
-* @brief Converts a raw array of bytes (presumably received from another MIDI host) to a queue of MIDI messages.
-*
-* @param[in] parser - Keeps track of partially received messages for which we're still waiting for the remaining bytes.
-* @param[in] bytes  - The array of raw bytes receive that presumably contains one or more MIDI messages.
-* @return           - A queue containing all of the MIDI messages parsed from the bytes array.
-*/
+ * Converts a raw array of bytes
+ * (presumably received from another MIDI host)
+ * to a queue of MIDI messages.
+ *
+ * :param parser:  Keeps track of partially received messages for
+ *                 which we're still waiting for the remaining bytes. (**Input only**.)
+ * :param bytes:   The array of raw bytes receive that presumably contains
+ *                 one or more MIDI messages. (**Input only**.)
+ * :return:        A queue containing all of the MIDI messages parsed from the bytes array.
+ *
+ * :since: v0.1
+ */
 midi_message_queue_t * parse_midi_messages(midi_message_parser_t *parser, uint8_t *bytes, uint16_t bytes_length)
 {
     midi_log_info("Parsing raw bytes into MIDI messages...");

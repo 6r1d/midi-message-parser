@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdbool.h>
 #include "parser_constants.h"
 #include "mem.h"
@@ -5,16 +6,24 @@
 #ifndef MIDI_PARSER_MSG_
 #define MIDI_PARSER_MSG_
 
-/*
- * @brief A MIDI message.
+/**
+ * A MIDI message.
+ *
+ * :since: v0.1
  */
-typedef struct {
+typedef struct midi_msg {
+    /**
+     * One of the command type constants defined above.
+     */
     uint8_t  command_type;
-    /**< One of the command type constants defined above. */
+    /**
+     * Channel number for commands that apply to a specific channel (e.g. note on, note off).
+     */
     uint8_t  channel;
-    /**< Channel number for commands that apply to a specific channel (e.g. note on, note off) */
+    /**
+     * The total number of bytes that constitute the message.
+     */
     uint32_t bytes_length;
-    /**< The total number of bytes that constitute the message. */
 
     union data {
         struct midi_note_message {
@@ -30,17 +39,26 @@ typedef struct {
             bool is_single_byte;
             uint8_t cc_id;
             uint8_t value;
-            // 0 - 63: ccr_base, 64 - 95: ccr_singlebyte, 96 - 101: ccr_inc_dec_par, 102 - 119: cc_undefined
+            // 0 - 63: ccr_base
+            // 64 - 95: ccr_singlebyte
+            // 96 - 101: ccr_inc_dec_par
+            // 102 - 119: cc_undefined
             enum command_change_range {ccr_base, ccr_singlebyte, ccr_inc_dec_par, ccr_undefined} cc_range;
         } cc_message;
     } cnt;
 
+    /**
+     * All the bytes that constitute the message
+     * (one status byte plus zero or more data bytes).
+     */
     uint8_t  bytes[];
-    /**< All the bytes that constitute the message (one status byte plus zero or more data bytes). */
 } midi_message_t;
 
-/*
- * @brief MIDI message constructor
+/**
+ * MIDI message constructor.
+ * Creates a new MIDI message instance.
+ *
+ * :since: v0.1
  */
 midi_message_t * new_midi_message()
 {
@@ -51,8 +69,12 @@ midi_message_t * new_midi_message()
     return message;
 }
 
-/*
- * @brief Deallocates the memory for a midi message.
+/**
+ * Deallocates the memory for a midi message.
+ *
+ * :param message*: a message instance to deallocate
+ *
+ * :since: v0.1
  */
 void free_midi_message(midi_message_t * message)
 {
@@ -65,11 +87,13 @@ void free_midi_message(midi_message_t * message)
     midi_free_with_hook(MIDI_MEMORY_CATEGORY, message, size);
 }
 
-/*
- * @brief Adds a byte of data to a MIDI message's `bytes` array.
+/**
+ * Adds a byte of data to a MIDI message's **bytes** array.
  *
- * @param[in,out] message_ptr - Pointer to the message into which the byte should be pushed
- * @param[in]     byte        - The byte to push into the message's `bytes` array
+ * :param message_ptr: Pointer to the message into which the byte should be pushed. (**Input** and **output**.)
+ * :param byte:        The byte to push into the message's `bytes` array (**Input only**.)
+ *
+ * :since: v0.1
  */
 void add_byte_to_midi_message(midi_message_t **message_ptr, uint8_t byte)
 {
@@ -92,12 +116,14 @@ void add_byte_to_midi_message(midi_message_t **message_ptr, uint8_t byte)
     (*message_ptr)->bytes[(*message_ptr)->bytes_length - 1] = byte;
 }
 
-/*
- * @brief Appends multiple bytes of data to a MIDI message's `bytes` array.
+/**
+ * Appends multiple bytes of data to a MIDI message's **bytes** array.
  *
- * @param[in,out] message_ptr  - Pointer to the message into which the byte should be pushed
- * @param[in]     bytes        - The bytes to push into the message's `bytes` array
- * @param[in]     bytes_length - The length of the bytes array.
+ * :param message_ptr:  Pointer to the message into which the byte should be pushed (**Input** and **output**.)
+ * :param bytes:        The bytes to push into the message's `bytes` array (**Input** only.)
+ * :param bytes_length: The length of the bytes array. (**Input** only.)
+ *
+ * :since: v0.1
  */
 void add_bytes_to_midi_message(midi_message_t **message_ptr, uint8_t *bytes, uint16_t bytes_length)
 {
@@ -124,8 +150,12 @@ void add_bytes_to_midi_message(midi_message_t **message_ptr, uint8_t *bytes, uin
 #ifndef MIDI_GETTYPE
 #define MIDI_GETTYPE
 
-/*
- * @brief Returns a `char` array describing a MIDI message type.
+/**
+ * Returns a **char** array describing a MIDI message type.
+ *
+ * :param command_type: A byte, describing MIDI command type
+ *
+ * :since: v0.1
  */
 const char * get_midi_msg_type(uint8_t command_type)
 {
@@ -212,6 +242,14 @@ const char * get_midi_msg_type(uint8_t command_type)
     return result;
 }
 
+/**
+ * Decodes a MIDI message.
+ * Adds a *note*, *velocity* and other parameters.
+ *
+ * :param message: A MIDI message instance
+ *
+ * :since: v0.1
+ */
 void bytes_to_data(midi_message_t *message) {
     uint8_t cmd_type = message->command_type;
     if (cmd_type >= MIDI_CMD_NOTE_OFF && cmd_type <= MIDI_CMD_NOTE_OFF + 0xF) {

@@ -8,6 +8,7 @@ MIDI message parser
    internals
    plan
    unused_examples
+   source_doc/main
    license
 
 This is a documentation for a MIDI message parser,

@@ -1,15 +1,24 @@
+#include <stdint.h>
 #include "mem.h"
 #include "msg.h"
 
-/**@brief A queue that holds MIDI messages. */
+/**
+ * A queue that holds MIDI messages.
+ */
 typedef struct {
-    uint16_t       length;
-    midi_message_t *messages[]; /**< Array of pointers to messages */
+    /** Message count */
+    uint16_t length;
+    /** Array of pointers to messages */
+    midi_message_t * messages[];
 } midi_message_queue_t;
 
 /**
-* @brief MIDI message queue constructor.
-*/
+ * MIDI message queue constructor.
+ * 
+ * :returns: a new midi_message_queue_t instance
+ *
+ * :since: v0.1
+ */
 midi_message_queue_t * new_midi_message_queue()
 {
     midi_message_queue_t * message_queue = (midi_message_queue_t *) midi_malloc_with_hook(MIDI_MEMORY_CATEGORY, sizeof(midi_message_queue_t));
@@ -18,8 +27,10 @@ midi_message_queue_t * new_midi_message_queue()
 }
 
 /**
-* @brief Deallocates the memory for the message queue and the messages it contains.
-*/
+ * Deallocates the memory for the message queue and the messages it contains.
+ *
+ * :since: v0.1
+ */
 void free_midi_message_queue(midi_message_queue_t * message_queue)
 {
     // First, free the messages in the queue
@@ -33,12 +44,17 @@ void free_midi_message_queue(midi_message_queue_t * message_queue)
 }
 
 /**
-* @brief Pushes a MIDI message into a MIDI message queue.
-*
-* @param[in,out] message_queue_ptr - Pointer to the message queue into which the message should be pushed
-* @param[in] message           - The message to push into the queue
-* @return                      - The updated message queue pointer after reallocating the memory to store the new message
-*/
+ * Pushes a MIDI message into a MIDI message queue.
+ *
+ * :param message_queue_ptr: Pointer to the message queue into
+ *                           which the message should be pushed (**Input and output**)
+ * :param message:           The message to push into the queue (**Input only**)
+ * :return:                  The updated message queue pointer
+ *                           after reallocating the memory
+ *                           to store the new message
+ *
+ * :since: v0.1
+ */
 void add_midi_message_to_queue(midi_message_queue_t **message_queue_ptr, midi_message_t *message)
 {
     if (!(message_queue_ptr && *message_queue_ptr && message))
@@ -58,12 +74,16 @@ void add_midi_message_to_queue(midi_message_queue_t **message_queue_ptr, midi_me
 }
 
 /**
-* @brief Revmoes a MIDI message at a given index from a MIDI message queue.
-*
-* @param[in,out] message_queue_ptr - Pointer to the message queue from which the message should be removed
-* @param[in] index             - The index of the message to be removed
-* @return                      - The updated message queue pointer after reallocating the memory for the message queue.
-*/
+ * Revmoes a MIDI message at a given index from a MIDI message queue.
+ *
+ * :param message_queue_ptr: Pointer to the message queue
+ *                           from which the message should be removed (**Input and output**)
+ * :param index:             The index of the message to be removed (**Input only**)
+ *
+ * :return: The updated message queue pointer after reallocating the memory for the message queue.
+ *
+ * :since: v0.1
+ */
 void remove_midi_message_from_queue(midi_message_queue_t **message_queue_ptr, uint16_t index)
 {
     if (!(message_queue_ptr && *message_queue_ptr))
@@ -94,11 +114,13 @@ void remove_midi_message_from_queue(midi_message_queue_t **message_queue_ptr, ui
 }
 
 /**
-* Transfers all of the MIDI messages from one queue to another.
-*
-* @param[in,out] destination_queue_ptr
-* @param[in,out] source_queue_ptr
-*/
+ * Transfers all of the MIDI messages from one queue to another.
+ *
+ * :param destination_queue_ptr: (**Input and output**)
+ * :param source_queue_ptr: (**Input and output**)
+ *
+ * :since: v0.1
+ */
 void transfer_midi_messages(midi_message_queue_t **destination_queue_ptr, midi_message_queue_t **source_queue_ptr)
 {
     if (!(destination_queue_ptr && *destination_queue_ptr && source_queue_ptr && *source_queue_ptr))
