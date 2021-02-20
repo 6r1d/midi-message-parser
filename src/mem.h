@@ -1,4 +1,4 @@
-#include "midi_logging.h"
+#include "logging.h"
 
 /**
 * @brief Hook called when the module calls malloc() to allocate memory.

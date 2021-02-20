@@ -1,6 +1,6 @@
 #include <stdbool.h>
-#include "midi_parser_constants.h"
-#include "midi_mem.h"
+#include "parser_constants.h"
+#include "mem.h"
 
 #ifndef MIDI_PARSER_MSG_
 #define MIDI_PARSER_MSG_

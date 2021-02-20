@@ -1,5 +1,5 @@
-#include "midi_mem.h"
-#include "midi_msg.h"
+#include "mem.h"
+#include "msg.h"
 
 /**@brief A queue that holds MIDI messages. */
 typedef struct {

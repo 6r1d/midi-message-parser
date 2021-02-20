@@ -7,11 +7,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "midi_msg.h"
-#include "midi_queue.h"
-#include "midi_logging.h"
-#include "midi_mem.h"
-#include "midi_parser_constants.h"
+#include "msg.h"
+#include "queue.h"
+#include "logging.h"
+#include "mem.h"
+#include "parser_constants.h"
 
 /**
 * @brief Enum for the possible states of a pending message being parsed.

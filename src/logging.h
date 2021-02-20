@@ -1,4 +1,4 @@
-#include "midi_parser_constants.h"
+#include "parser_constants.h"
 
 // Allow logging functionality to be excluded, because devices with memory limitations may not
 // have the capacity to include stdarg.h
