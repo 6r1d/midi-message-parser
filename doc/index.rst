@@ -1,14 +1,20 @@
 MIDI message parser
 ===================
 
+.. note::
+
+    This is not an `official version <https://github.com/BinaryNate/midi-message-parser>`_ of MIDI message parser.
+    It is an experimental fork by `6r1d <https://github.com/6r1d>`_.
+    The API will change from time to time and library will be improving.
+
 .. toctree::
    :maxdepth: 3
    :caption: Contents:
 
    internals
    plan
-   unused_examples
    source_doc/main
+   examples
    license
 
 This is a documentation for a MIDI message parser,
