@@ -3,7 +3,7 @@
 This is not an [official version](https://github.com/BinaryNate/midi-message-parser) of MIDI message parser. It is an experimental fork by [6r1d](https://github.com/6r1d).
 The API will change from time to time and library will be improving.
 
-This is a file [GitHub](http://github.com/) should display by default so users can build the documentation.
+This is a file [GitHub](http://github.com/) should display by default, so the users can build the documentation.
 
 ## Skimming through the docs
 
