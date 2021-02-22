@@ -58,4 +58,14 @@ Output format:
 message types
 -------------
 
-Demonstrates how **get_midi_msg_type** works by iterating through a number of MIDI message types :math:`[128, 255]`.
+Demonstrates how **get_midi_msg_type** works.
+
+This example iterates through a range of MIDI status bytes: :math:`[128, 255]`.
+It displays:
+
+* the status byte in binary, decimal and hexadecimal form
+* MIDI message type and a channel for a byte, if available.
+
+**TODO**: the "print_bits" function assumes little endian value. Check if it's displayed correctly.
+
+.. literalinclude:: ../examples/message_types/message_types.c
